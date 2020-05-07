@@ -2,9 +2,13 @@ import React, { useState } from 'react';
 import {
     Carousel,
     CarouselControl,
-    CarouselIndicators
+    CarouselIndicators,
+    CarouselItem,
+    CarouselCaption
 } from 'reactstrap';
 import Resource from './Resource';
+import ResourceBroken from './Resource-Broken';
+import {Content} from './Content';
 
 
 const Example = ({items}) => {
@@ -27,7 +31,23 @@ const Example = ({items}) => {
         if (animating) return;
         setActiveIndex(newIndex);
     }
-
+    const slidesExternal = items.map(item => {
+        return (<Resource item={item} setAnimating={setAnimating} />)
+    })
+    // This is the only one that works
+    const slidesInternal = items.map(item => {
+        const content = <Content item={item}/>
+        return (
+            <CarouselItem
+                onExiting={() => setAnimating(true)}
+                onExited={() => setAnimating(false)}
+                key={item.src}
+            >
+                <img src={item.src} alt={item.altText} />
+                <CarouselCaption captionText={content} captionHeader={item.caption} />
+            </CarouselItem>
+        );
+    })
     return (
         <Carousel
             activeIndex={activeIndex}
@@ -36,7 +56,9 @@ const Example = ({items}) => {
             interval={false}
         >
             <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={goToIndex} />
-            <Resource items={items} setAnimating={setAnimating}/>
+            {/* {slidesExternal} */}
+            {slidesInternal}
+            {/* <ResourceBroken items={items} setAnimating={setAnimating} /> */}
             <CarouselControl direction="prev" directionText="Previous" onClickHandler={previous} />
             <CarouselControl direction="next" directionText="Next" onClickHandler={next} />
         </Carousel>
